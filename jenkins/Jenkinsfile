@@ -1,11 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'snakee/golang-junit:1.21'
-            reuseNode true
-            args '-u root:root -e GOCACHE=/tmp/go-build -e GOTMPDIR=/tmp/go-tmp -e HOME=/tmp'
-        }
-    }
+    agent any
 
     environment {
         GOCACHE = '/tmp/go-build'
@@ -15,6 +9,13 @@ pipeline {
 
     stages {
         stage('Unit Tests-Backend') {
+            agent {
+                docker {
+                    image 'snakee/golang-junit:1.21'
+                    reuseNode true
+                    args '-u root:root -e GOCACHE=/tmp/go-build -e GOTMPDIR=/tmp/go-tmp -e HOME=/tmp'
+                }
+            }
             steps {
                 sh '''
                     mkdir -p "$GOCACHE" "$GOTMPDIR"
@@ -24,13 +25,6 @@ pipeline {
             }
         }
         stage('Unit Tests-Frontend') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    reuseNode true
-                    args '--user root:root -e HOME=/tmp'
-                }
-            }
             steps {
                 dir('bugtracker-frontend') {
                     sh '''

@@ -28,7 +28,7 @@ pipeline {
             steps {
                 dir('bugtracker-frontend') {
                     sh '''
-                        npm ci
+                        npm install --no-audit --no-fund
                         npm test -- --watch=false
                     '''
                 }

@@ -23,8 +23,8 @@ pipeline {
                 '''
             }
         }
-        stage ('Unit Tests-Frontend') {
-            agent{
+        stage('Unit Tests-Frontend') {
+            agent {
                 docker {
                     image 'node:20-alpine'
                     reuseNode true
@@ -33,11 +33,11 @@ pipeline {
             steps {
                 dir('bugtracker-frontend') {
                     sh '''
-                     npm ci
-                     npm test
+                        npm ci
+                        npm test
                     '''
                 }
             }
-        }   
+        }
     }
 }

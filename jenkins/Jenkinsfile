@@ -24,6 +24,13 @@ pipeline {
             }
         }
         stage('Unit Tests-Frontend') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                    args '--user root:root -e HOME=/tmp'
+                }
+            }
             steps {
                 dir('bugtracker-frontend') {
                     sh '''

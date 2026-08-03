@@ -13,15 +13,17 @@ pipeline {
                 docker {
                     image 'snakee/golang-junit:1.21'
                     reuseNode true
-                    args '-u root:root -e GOCACHE=/tmp/go-build -e GOTMPDIR=/tmp/go-tmp -e HOME=/tmp'
                 }
             }
             steps {
-                sh '''
-                    mkdir -p "$GOCACHE" "$GOTMPDIR"
-                    cd bugtracker-backend
-                    go test -v ./...
-                '''
+                dir('bugtracker-backend') {
+                    sh 'go test -v ./... 2>&1 | go-junit-report > test-results.xml'   
+                }
+            }
+            post {
+                always {
+                    junit 'bugtracker-backend/test-results.xml'
+                }
             }
         }
         stage('Unit Tests-Frontend') {

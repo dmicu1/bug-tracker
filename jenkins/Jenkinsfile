@@ -18,11 +18,11 @@ pipeline {
             steps {
                 dir('bugtracker-backend') {
                     sh '''
-                        mkdir -p ${WORKSPACE}/.gopath/pkg/mod ${WORKSPACE}/.gocache
+                        mkdir -p ${WORKSPACE}/.gopath/pkg/mod ${WORKSPACE}/.gocache ${GOTMPDIR}
                         export GOPATH=${WORKSPACE}/.gopath
                         export GOMODCACHE=${GOPATH}/pkg/mod
                         export GOCACHE=${WORKSPACE}/.gocache
-                        go test -v ./... 2>&1 > go-test-output.log
+                        go test -v ./... > go-test-output.log 2>&1
                         cat go-test-output.log | go-junit-report > ${WORKSPACE}/bugtracker-backend/test-results.xml
                     '''
                 }

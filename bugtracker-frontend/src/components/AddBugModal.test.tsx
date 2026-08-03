@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddBugModal from "./AddBugModal";
 
@@ -69,7 +69,7 @@ describe("AddBugModal", () => {
 
     expect(titleInput).toHaveValue("New Bug");
     expect(descriptionInput).toHaveValue("New Description");
-    expect(prioritySelect).toHaveValue("Low");
+    expect(prioritySelect).toHaveValue("LowXXX");
   });
 
   it("should not submit form with empty required fields", async () => {

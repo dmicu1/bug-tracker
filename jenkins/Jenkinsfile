@@ -24,12 +24,26 @@ pipeline {
                         export GOCACHE=${WORKSPACE}/.gocache
                         go test -v ./... > go-test-output.log 2>&1
                         cat go-test-output.log | go-junit-report > ${WORKSPACE}/bugtracker-backend/test-results.xml
+                        # Generate coverage report
+                        go test -coverprofile=coverage.out -covermode=atomic./...
+                        go tool cover -html=coverage.out -o coverage.html
+
+                        mkdir -p reports
+                        mv coverage.html reports/
+
                     '''
+                    
                 }
             }
             post {
                 always {
                     junit 'bugtracker-backend/test-results.xml'
+                    publishHTML(target: [
+                    
+                        reportDir: 'bugtracker-backend/reports',
+                        reportFiles: 'coverage.html',
+                        reportName: 'BackendCoverage Report'
+                    ])
                 }
             }
         }

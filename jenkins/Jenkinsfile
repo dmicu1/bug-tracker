@@ -8,7 +8,9 @@ pipeline {
     }
 
     stages {
-        stage('Unit Tests-Backend') {
+        stage ('Execute Unit Tests') {
+            parallel {
+                stage('Unit Tests-Backend') {
             agent {
                 docker {
                     image 'snakee/golang-junit:1.21'
@@ -42,12 +44,14 @@ pipeline {
                     
                         reportDir: 'bugtracker-backend/reports',
                         reportFiles: 'coverage.html',
-                        reportName: 'BackendCoverage Report'
+                        reportName: 'Backend Coverage Report'
                     ])
                 }
             }
         }
-        stage('Unit Tests-Frontend') {
+            }
+        }
+         stage('Unit Tests-Frontend') {
             agent {
                 docker {
                     image 'node:20-alpine'
@@ -75,6 +79,7 @@ pipeline {
                     ]
                 }
             }
+      
         }
     }
 }

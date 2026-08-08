@@ -8,81 +8,82 @@ pipeline {
     }
 
     stages {
-        stage('Execute Unit Tests') {
+        stage ('Execute Unit Tests') {
             parallel {
-                stage('Unit Tests Backend') {
-                    agent {
-                        docker {
-                            image 'snakee/golang-junit:1.21'
-                            reuseNode true
-                        }
-                    }
-                    steps {
-                        dir('bugtracker-backend') {
-                            sh '''
-                                mkdir -p ${WORKSPACE}/.gopath/pkg/mod ${WORKSPACE}/.gocache ${GOTMPDIR}
-                                export GOPATH=${WORKSPACE}/.gopath
-                                export GOMODCACHE=${GOPATH}/pkg/mod
-                                export GOCACHE=${WORKSPACE}/.gocache
-
-                                go test -v ./... > go-test-output.log 2>&1
-                                cat go-test-output.log | go-junit-report > ${WORKSPACE}/bugtracker-backend/test-results.xml
-
-                                go test -coverprofile=coverage.out -covermode=atomic ./...
-                                go tool cover -html=coverage.out -o coverage.html
-
-                                mkdir -p reports
-                                mv coverage.html reports/
-                            '''
-                        }
-                    }
-                    post {
-                        always {
-                            junit 'bugtracker-backend/test-results.xml'
-                            publishHTML(target: [
-                                reportDir: 'bugtracker-backend/reports',
-                                reportFiles: 'coverage.html',
-                                reportName: 'Backend Coverage Report'
-                            ])
-                        }
-                    }
+                stage('Unit Tests-Backend') {
+            agent {
+                docker {
+                    image 'snakee/golang-junit:1.21'
+                    reuseNode true
                 }
+            }
+            steps {
+                dir('bugtracker-backend') {
+                    sh '''
+                        mkdir -p ${WORKSPACE}/.gopath/pkg/mod ${WORKSPACE}/.gocache ${GOTMPDIR}
+                        export GOPATH=${WORKSPACE}/.gopath
+                        export GOMODCACHE=${GOPATH}/pkg/mod
+                        export GOCACHE=${WORKSPACE}/.gocache
+                        go test -v ./... > go-test-output.log 2>&1
+                        cat go-test-output.log | go-junit-report > ${WORKSPACE}/bugtracker-backend/test-results.xml
+                        # Generate coverage report
+                        go test -coverprofile=coverage.out -covermode=atomic ./...
+                        go tool cover -html=coverage.out -o coverage.html
 
-                stage('Unit Tests Frontend') {
-                    agent {
-                        docker {
-                            image 'node:20-alpine'
-                            reuseNode true
-                            args '--user root:root -e HOME=/tmp'
-                        }
-                    }
-                    steps {
-                        dir('bugtracker-frontend') {
-                            sh '''
-                                npm ci --no-audit --no-fund
-                                npm test -- --watch=false
-                                mkdir -p reports
-                                rm -rf reports/coverage
-                                mv coverage reports/coverage
-                            '''
-                        }
-                    }
-                    post {
-                        always {
-                            junit 'bugtracker-frontend/test-results.xml'
-                            publishHTML(target: [
-                                reportDir: 'bugtracker-frontend/reports/coverage',
-                                reportFiles: 'index.html',
-                                reportName: 'Frontend Coverage Report'
-                            ])
-                        }
-                    }
+                        mkdir -p reports
+                        mv coverage.html reports/
+
+                    '''
+                    
+                }
+            }
+            post {
+                always {
+                    junit 'bugtracker-backend/test-results.xml'
+                    publishHTML(target: [
+                    
+                        reportDir: 'bugtracker-backend/reports',
+                        reportFiles: 'coverage.html',
+                        reportName: 'Backend Coverage Report'
+                    ])
                 }
             }
         }
-
-        stage('Launch Application') {
+            }
+        }
+         stage('Unit Tests-Frontend') {
             agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                    args '--user root:root -e HOME=/tmp'
+                }
+            }
+            steps {
+                dir('bugtracker-frontend') {
+                    sh '''
+                        npm install --no-audit --no-fund
+                        npm test -- --watch=false
+                        mkdir -p reports
+                        rm -rf reports/coverage
+                        mv coverage reports/coverage
+                    '''
+                }
+            }
+            post {
+                always {
+                    junit 'bugtracker-frontend/test-results.xml'
+                    publishHTML target: [
+                        reportDir: 'bugtracker-frontend/reports/coverage',
+                        reportFiles: 'index.html',
+                        reportName: 'Frontend Coverage Report'
+                    ]
+                }
+            }
+      
+        }
+        stage ('Launch application') {
+           agent {
                 docker {
                     image 'docker:27.5.1'
                     reuseNode true
@@ -90,38 +91,37 @@ pipeline {
                 }
             }
             steps {
-                sh 'docker compose up --build -d'
+               sh 'docker compose up --build -d'
             }
         }
-
-        stage('API Tests') {
+        stage('Api Test'){
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.50.0-noble'
+                    image 'mcr.microsoft.com/playwright:v1.44.0-focal'
                     reuseNode true
                     args '-u 0 --network=host'
                 }
             }
             steps {
                 dir('tests-api') {
-                    sh 'npm ci --no-audit --no-fund'
                     sh 'npx wait-port http://localhost:8080/api/health -t 30000'
-                    sh 'npx playwright test'
+
+                    sh 'npm ci'
+                    sh 'npx playwright test '
                 }
             }
             post {
                 always {
-                    junit 'tests-api/test-results/results.xml'
+                    junit 'tests-api/test-results.xml'
                     publishHTML(target: [
                         reportDir: 'tests-api/playwright-report',
                         reportFiles: 'index.html',
-                        reportName: 'API Test Report'
+                        reportName: 'Playwright API Test Report'
                     ])
                 }
             }
         }
     }
-
     post {
         always {
             cleanWs()

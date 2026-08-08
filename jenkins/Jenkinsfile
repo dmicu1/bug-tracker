@@ -97,22 +97,21 @@ pipeline {
         stage('Api Test'){
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.44.0-focal'
+                    image 'mcr.microsoft.com/playwright:v1.50.0-noble'
                     reuseNode true
                     args '-u 0 --network=host'
                 }
             }
             steps {
                 dir('tests-api') {
+                    sh 'npm ci --no-audit --no-fund'
                     sh 'npx wait-port http://localhost:8080/api/health -t 30000'
-
-                    sh 'npm ci'
-                    sh 'npx playwright test '
+                    sh 'npx playwright test'
                 }
             }
             post {
                 always {
-                    junit 'tests-api/test-results.xml'
+                    junit 'tests-api/test-results/results.xml'
                     publishHTML(target: [
                         reportDir: 'tests-api/playwright-report',
                         reportFiles: 'index.html',

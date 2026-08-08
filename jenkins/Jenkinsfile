@@ -65,7 +65,8 @@ pipeline {
                         npm install --no-audit --no-fund
                         npm test -- --watch=false
                         mkdir -p reports
-                        mv coverage reports/
+                        rm -rf reports/coverage
+                        mv coverage reports/coverage
                     '''
                 }
             }

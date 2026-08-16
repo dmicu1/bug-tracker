@@ -1,7 +1,5 @@
 import http from "k6/http";
 import { sleep, check } from "k6";
-import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
-import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 
 export const options = {
   duration: "30s",
@@ -12,9 +10,19 @@ export const options = {
   },
 };
 
+const BASE_URL = __ENV.BASE_URL || "http://localhost:8080";
+
+function parseJson(body) {
+  try {
+    return JSON.parse(body);
+  } catch {
+    return null;
+  }
+}
+
 export default function () {
   // Health check
-  const healthRes = http.get("http://localhost:8080/api/health");
+  const healthRes = http.get(`${BASE_URL}/api/health`);
   check(healthRes, {
     "health check status is 200": (r) => r.status === 200,
   });
@@ -29,21 +37,33 @@ export default function () {
 
   const headers = { "Content-Type": "application/json" };
 
-  const createBugRes = http.post("http://localhost:8080/api/bugs", payload, {
+  const createBugRes = http.post(`${BASE_URL}/api/bugs`, payload, {
     headers,
   });
 
   check(createBugRes, {
     "create bug status is 201": (r) => r.status === 201,
-    "bug has an id": (r) => JSON.parse(r.body).id !== undefined,
+    "bug has an id": (r) => {
+      const body = parseJson(r.body);
+      return body !== null && body.id !== undefined;
+    },
   });
 
   sleep(5);
 }
 
 export function handleSummary(data) {
+  const checksRate = data.metrics.checks?.rate;
+  const failedRate = data.metrics.http_req_failed?.rate;
+  const durationP95 = data.metrics.http_req_duration?.percentiles?.["p(95)"];
+
   return {
-    "perf-results.html": htmlReport(data),
-    stdout: textSummary(data, { indent: " ", enableColors: true }),
+    "perf-results.json": JSON.stringify(data, null, 2),
+    stdout: [
+      "Performance test summary",
+      `checks rate: ${checksRate ?? "n/a"}`,
+      `http request failed rate: ${failedRate ?? "n/a"}`,
+      `http request duration p95: ${durationP95 ?? "n/a"}ms`,
+    ].join("\n"),
   };
 }

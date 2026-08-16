@@ -145,7 +145,7 @@ pipeline {
                 }
             } 
         }
-        stage('Performance Tests'){ {
+        stage('Performance Tests'){
             agent {
                 docker {
                     image 'grafana/k6:0.45.0'

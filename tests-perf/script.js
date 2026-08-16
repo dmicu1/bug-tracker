@@ -15,7 +15,7 @@ const BASE_URL = __ENV.BASE_URL || "http://localhost:8080";
 function parseJson(body) {
   try {
     return JSON.parse(body);
-  } catch {
+  } catch (error) {
     return null;
   }
 }
@@ -53,17 +53,21 @@ export default function () {
 }
 
 export function handleSummary(data) {
-  const checksRate = data.metrics.checks?.rate;
-  const failedRate = data.metrics.http_req_failed?.rate;
-  const durationP95 = data.metrics.http_req_duration?.percentiles?.["p(95)"];
+  const checksRate = data.metrics.checks && data.metrics.checks.rate;
+  const failedRate =
+    data.metrics.http_req_failed && data.metrics.http_req_failed.rate;
+  const durationP95 =
+    data.metrics.http_req_duration &&
+    data.metrics.http_req_duration.percentiles &&
+    data.metrics.http_req_duration.percentiles["p(95)"];
 
   return {
     "perf-results.json": JSON.stringify(data, null, 2),
     stdout: [
       "Performance test summary",
-      `checks rate: ${checksRate ?? "n/a"}`,
-      `http request failed rate: ${failedRate ?? "n/a"}`,
-      `http request duration p95: ${durationP95 ?? "n/a"}ms`,
+      `checks rate: ${checksRate !== undefined ? checksRate : "n/a"}`,
+      `http request failed rate: ${failedRate !== undefined ? failedRate : "n/a"}`,
+      `http request duration p95: ${durationP95 !== undefined ? durationP95 : "n/a"}ms`,
     ].join("\n"),
   };
 }

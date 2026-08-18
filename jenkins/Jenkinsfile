@@ -155,14 +155,18 @@ pipeline {
             }
             steps {
                 dir('tests-perf') {
-                    sh 'k6 run script.js'
+                    sh '''
+                        rm -rf k6-report
+                        mkdir -p k6-report
+                        k6 run script.js
+                    '''
                 }
             }
             post {
                 always {
                     publishHTML(target: [
-                        reportDir: 'tests-perf',
-                        reportFiles: 'perf-results.html',
+                        reportDir: 'tests-perf/k6-report',
+                        reportFiles: 'index.html',
                         reportName: 'Performance Test Results Report'
                     ])
                 }

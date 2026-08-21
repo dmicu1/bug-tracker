@@ -23,6 +23,18 @@ const seconds = (milliseconds = 0) => {
 const normalizePath = (path = "") =>
   path ? relative(process.cwd(), path).replaceAll("\\", "/") || basename(path) : "";
 
+const escapeCommandData = (value = "") =>
+  String(value).replaceAll("%", "%25").replaceAll("\r", "%0D").replaceAll("\n", "%0A");
+
+const escapeCommandProperty = (value = "") =>
+  escapeCommandData(value).replaceAll(":", "%3A").replaceAll(",", "%2C");
+
+const summarizeError = (message = "") =>
+  String(message)
+    .split("\n")
+    .map((line) => line.trim())
+    .find((line) => line && !line.startsWith("●")) || "Runtime error";
+
 const testSuites = results.testResults ?? [];
 const totalTests = Number(results.numTotalTests ?? 0);
 const totalFailures = Number(results.numFailedTests ?? 0);
@@ -101,6 +113,14 @@ if (runtimeErrors.length > 0) {
   for (const { name, message } of runtimeErrors) {
     console.log(`\n--- ${name} ---`);
     console.log(message);
+
+    if (process.env.GITHUB_ACTIONS === "true") {
+      console.log(
+        `::error file=${escapeCommandProperty(name)},title=Jest runtime error::${escapeCommandData(
+          summarizeError(message)
+        )}`
+      );
+    }
   }
 }
 

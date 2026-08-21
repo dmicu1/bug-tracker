@@ -68,6 +68,7 @@ jobs:
 
           npm ci 2>&1 | tee npm-ci-output.txt
           ci_exit=${PIPESTATUS[0]}
+          test_exit=0
           if [ "$ci_exit" -ne 0 ]; then
             {
               echo "npm ci failed; Jest was not executed."
@@ -84,14 +85,13 @@ jobs:
             </testsuite>
           </testsuites>
           EOF
-            exit "$ci_exit"
-          fi
+            test_exit=$ci_exit
+          else
+            npm test -- --ci --watch=false 2>&1 | tee full-test-output.txt
+            test_exit=${PIPESTATUS[0]}
 
-          npm test -- --ci --watch=false 2>&1 | tee full-test-output.txt
-          test_exit=${PIPESTATUS[0]}
-
-          if [ ! -s test-results.xml ] || ! grep -q "<testcase" test-results.xml; then
-            cat > test-results.xml <<'EOF'
+            if [ ! -s test-results.xml ] || ! grep -q "<testcase" test-results.xml; then
+              cat > test-results.xml <<'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <testsuites name="frontend tests" tests="1" failures="1" errors="0" skipped="0">
             <testsuite name="frontend tests" tests="1" failures="1" errors="0" skipped="0">
@@ -101,7 +101,8 @@ jobs:
             </testsuite>
           </testsuites>
           EOF
-            test_exit=1
+              test_exit=1
+            fi
           fi
 
           set -e
@@ -112,6 +113,22 @@ jobs:
           echo "```">> $GITHUB_STEP_SUMMARY
 
           exit $test_exit
+
+      - name: Ensure Frontend Test Results Exist
+        if: ${{ !cancelled() }}
+        run: |
+          if [ ! -s ./bugtracker-frontend/test-results.xml ] || ! grep -q "<testcase" ./bugtracker-frontend/test-results.xml; then
+            cat > ./bugtracker-frontend/test-results.xml <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <testsuites name="frontend tests" tests="1" failures="1" errors="0" skipped="0">
+            <testsuite name="frontend tests" tests="1" failures="1" errors="0" skipped="0">
+              <testcase classname="frontend tests" name="missing junit report">
+                <failure message="Frontend test-results.xml was not generated">A previous setup or test step failed before Jest could produce a JUnit report.</failure>
+              </testcase>
+            </testsuite>
+          </testsuites>
+          EOF
+          fi
      
       - name: Publish Frontend Unit Test Results
         uses: dorny/test-reporter@v3

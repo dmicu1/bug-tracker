@@ -5,6 +5,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
 jobs:
   unit-tests-backend:
     runs-on: ubuntu-latest
@@ -34,11 +39,11 @@ jobs:
 
       - name: Publish Backend Unit Test Results
         uses: dorny/test-reporter@v3
-        if: always()
+        if: ${{ !cancelled() }}
         with:
           name: Backend Unit Tests
           path: ./bugtracker-backend/test-results.xml
-          reporter: jest-junit
+          reporter: java-junit
 
   unit-tests-frontend:
     needs: unit-tests-backend
@@ -57,17 +62,27 @@ jobs:
         working-directory: ./bugtracker-frontend
         run: |
           npm ci
-          npm test | tee full-test-output.txt
+          set +e
+          npm test -- --ci --watch=false 2>&1 | tee full-test-output.txt
+          test_exit=${PIPESTATUS[0]}
+          set -e
+
+          test -s test-results.xml
+          grep -q "<testcase" test-results.xml
 
           echo "## Frontend Test Coverage Report">> $GITHUB_STEP_SUMMARY
           echo "```">> $GITHUB_STEP_SUMMARY
-          cat full_output.txt >> $GITHUB_STEP_SUMMARY
+          cat full-test-output.txt >> $GITHUB_STEP_SUMMARY
           echo "```">> $GITHUB_STEP_SUMMARY
+
+          exit $test_exit
      
       - name: Publish Frontend Unit Test Results
         uses: dorny/test-reporter@v3
-        if: always()
+        if: ${{ !cancelled() }}
         with:
           name: Frontend Unit Tests
-          path: ./bugtracker-frontend/test-results.xml
+          path: test-results.xml
           reporter: jest-junit
+          working-directory: ./bugtracker-frontend
+          fail-on-empty: true

@@ -60,15 +60,51 @@ jobs:
 
       - name: Execute Frontend Unit Tests
         working-directory: ./bugtracker-frontend
+        env:
+          JEST_JUNIT_OUTPUT_DIR: .
+          JEST_JUNIT_OUTPUT_NAME: test-results.xml
         run: |
-          npm ci
           set +e
+
+          npm ci 2>&1 | tee npm-ci-output.txt
+          ci_exit=${PIPESTATUS[0]}
+          if [ "$ci_exit" -ne 0 ]; then
+            {
+              echo "npm ci failed; Jest was not executed."
+              echo
+              cat npm-ci-output.txt
+            } > full-test-output.txt
+            cat > test-results.xml <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <testsuites name="frontend setup" tests="1" failures="1" errors="0" skipped="0">
+            <testsuite name="frontend setup" tests="1" failures="1" errors="0" skipped="0">
+              <testcase classname="frontend setup" name="npm ci">
+                <failure message="npm ci failed before Jest could run">See full-test-output.txt in the workflow logs.</failure>
+              </testcase>
+            </testsuite>
+          </testsuites>
+          EOF
+            exit "$ci_exit"
+          fi
+
           npm test -- --ci --watch=false 2>&1 | tee full-test-output.txt
           test_exit=${PIPESTATUS[0]}
-          set -e
 
-          test -s test-results.xml
-          grep -q "<testcase" test-results.xml
+          if [ ! -s test-results.xml ] || ! grep -q "<testcase" test-results.xml; then
+            cat > test-results.xml <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <testsuites name="frontend tests" tests="1" failures="1" errors="0" skipped="0">
+            <testsuite name="frontend tests" tests="1" failures="1" errors="0" skipped="0">
+              <testcase classname="frontend tests" name="jest junit output">
+                <failure message="Jest did not produce test-results.xml">See full-test-output.txt in the workflow logs.</failure>
+              </testcase>
+            </testsuite>
+          </testsuites>
+          EOF
+            test_exit=1
+          fi
+
+          set -e
 
           echo "## Frontend Test Coverage Report">> $GITHUB_STEP_SUMMARY
           echo "```">> $GITHUB_STEP_SUMMARY
@@ -82,7 +118,6 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: Frontend Unit Tests
-          path: test-results.xml
+          path: ./bugtracker-frontend/test-results.xml
           reporter: jest-junit
-          working-directory: ./bugtracker-frontend
           fail-on-empty: true

@@ -43,7 +43,7 @@
   "jest-junit": {
     "outputDirectory": ".",
     "outputName": "test-results.xml",
-    "ancestorSeparator": " › ",
+    "ancestorSeparator": " > ",
     "uniqueOutputName": "false",
     "suiteNameTemplate": "{filepath}",
     "classNameTemplate": "{classname}",

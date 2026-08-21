@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "jest --coverage --coverageReporters='text-summary' --coverageReporters='text' --coverageReporters='html' --reporters=default --reporters=jest-junit",
+    "test": "jest --coverage --coverageReporters='text-summary' --coverageReporters='text' --coverageReporters='html'",
     "test:watch": "jest --watch",
     "test:integration": "playwright test"
   },
@@ -39,15 +39,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.67.0"
-  },
-  "jest-junit": {
-    "outputDirectory": ".",
-    "outputName": "test-results.xml",
-    "ancestorSeparator": " > ",
-    "uniqueOutputName": "false",
-    "suiteNameTemplate": "{filepath}",
-    "classNameTemplate": "{classname}",
-    "titleTemplate": "{title}"
   },
   "allowScripts": {
     "unrs-resolver@1.12.2": true

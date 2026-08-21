@@ -89,6 +89,21 @@ const suiteXml = testSuites
   })
   .join("\n");
 
+const runtimeErrors = testSuites
+  .filter((suite) => suite.status === "failed" && (suite.assertionResults ?? []).length === 0)
+  .map((suite) => ({
+    name: normalizePath(suite.name) || "jest",
+    message: suite.message || "Runtime error",
+  }));
+
+if (runtimeErrors.length > 0) {
+  console.log("\nJest runtime errors:");
+  for (const { name, message } of runtimeErrors) {
+    console.log(`\n--- ${name} ---`);
+    console.log(message);
+  }
+}
+
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites name="jest tests" tests="${totalTests || testSuites.length}" failures="${totalFailures}" errors="${totalErrors}" skipped="${totalSkipped}" time="${seconds(
   totalTime

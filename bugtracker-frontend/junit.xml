@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="60" failures="0" errors="0" time="14.335">
+  <testsuite name="Bug API" errors="0" failures="0" skipped="0" timestamp="2026-08-21T13:50:22" time="4.166" tests="14">
+    <testcase classname="Bug API getBugs should fetch bugs successfully" name="Bug API getBugs should fetch bugs successfully" time="0.119">
+    </testcase>
+    <testcase classname="Bug API getBugs should handle network errors when fetching bugs" name="Bug API getBugs should handle network errors when fetching bugs" time="0.036">
+    </testcase>
+    <testcase classname="Bug API getBugs should handle invalid JSON responses when fetching bugs" name="Bug API getBugs should handle invalid JSON responses when fetching bugs" time="0.022">
+    </testcase>
+    <testcase classname="Bug API createBug should create a new bug successfully" name="Bug API createBug should create a new bug successfully" time="0.006">
+    </testcase>
+    <testcase classname="Bug API createBug should handle API errors when creating a bug" name="Bug API createBug should handle API errors when creating a bug" time="0.003">
+    </testcase>
+    <testcase classname="Bug API createBug should handle network errors when creating a bug" name="Bug API createBug should handle network errors when creating a bug" time="0.01">
+    </testcase>
+    <testcase classname="Bug API createBug should handle invalid JSON responses when creating a bug" name="Bug API createBug should handle invalid JSON responses when creating a bug" time="0.006">
+    </testcase>
+    <testcase classname="Bug API updateBug should update a bug successfully" name="Bug API updateBug should update a bug successfully" time="0.006">
+    </testcase>
+    <testcase classname="Bug API updateBug should handle not found error when updating a bug" name="Bug API updateBug should handle not found error when updating a bug" time="0.006">
+    </testcase>
+    <testcase classname="Bug API updateBug should handle network errors when updating a bug" name="Bug API updateBug should handle network errors when updating a bug" time="0.012">
+    </testcase>
+    <testcase classname="Bug API updateBug should handle invalid JSON responses when updating a bug" name="Bug API updateBug should handle invalid JSON responses when updating a bug" time="0.005">
+    </testcase>
+    <testcase classname="Bug API deleteBug should delete a bug successfully" name="Bug API deleteBug should delete a bug successfully" time="0.003">
+    </testcase>
+    <testcase classname="Bug API deleteBug should handle not found error when deleting a bug" name="Bug API deleteBug should handle not found error when deleting a bug" time="0.004">
+    </testcase>
+    <testcase classname="Bug API deleteBug should handle network errors when deleting a bug" name="Bug API deleteBug should handle network errors when deleting a bug" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="EditBugModal" errors="0" failures="0" skipped="0" timestamp="2026-08-21T13:50:21" time="5.33" tests="6">
+    <testcase classname="EditBugModal renders nothing when isOpen is false" name="EditBugModal renders nothing when isOpen is false" time="0.306">
+    </testcase>
+    <testcase classname="EditBugModal renders modal content when isOpen is true" name="EditBugModal renders modal content when isOpen is true" time="0.293">
+    </testcase>
+    <testcase classname="EditBugModal calls onClose when Cancel button is clicked" name="EditBugModal calls onClose when Cancel button is clicked" time="0.12">
+    </testcase>
+    <testcase classname="EditBugModal updates form fields when input values change" name="EditBugModal updates form fields when input values change" time="0.07">
+    </testcase>
+    <testcase classname="EditBugModal calls onSubmit with updated values when form is submitted" name="EditBugModal calls onSubmit with updated values when form is submitted" time="0.059">
+    </testcase>
+    <testcase classname="EditBugModal updates priority and status when select values change" name="EditBugModal updates priority and status when select values change" time="0.093">
+    </testcase>
+  </testsuite>
+  <testsuite name="DeleteBugButton" errors="0" failures="0" skipped="0" timestamp="2026-08-21T13:50:22" time="5.523" tests="3">
+    <testcase classname="DeleteBugButton should render the delete button" name="DeleteBugButton should render the delete button" time="1.23">
+    </testcase>
+    <testcase classname="DeleteBugButton should call onDelete when the delete button is clicked" name="DeleteBugButton should call onDelete when the delete button is clicked" time="0.085">
+    </testcase>
+    <testcase classname="DeleteBugButton should log an error when the delete request fails" name="DeleteBugButton should log an error when the delete request fails" time="0.075">
+    </testcase>
+  </testsuite>
+  <testsuite name="DeleteConfirmationModal" errors="0" failures="0" skipped="0" timestamp="2026-08-21T13:50:22" time="5.703" tests="4">
+    <testcase classname="DeleteConfirmationModal should not render the modal when isOpen is false" name="DeleteConfirmationModal should not render the modal when isOpen is false" time="0.285">
+    </testcase>
+    <testcase classname="DeleteConfirmationModal should render the modal when isOpen is true" name="DeleteConfirmationModal should render the modal when isOpen is true" time="0.89">
+    </testcase>
+    <testcase classname="DeleteConfirmationModal should call onClose when the Cancel button is clicked" name="DeleteConfirmationModal should call onClose when the Cancel button is clicked" time="0.151">
+    </testcase>
+    <testcase classname="DeleteConfirmationModal should call onConfirm when the Delete button is clicked" name="DeleteConfirmationModal should call onConfirm when the Delete button is clicked" time="0.152">
+    </testcase>
+  </testsuite>
+  <testsuite name="Notification" errors="0" failures="0" skipped="0" timestamp="2026-08-21T13:50:22" time="5.836" tests="7">
+    <testcase classname="Notification should render with the provided message" name="Notification should render with the provided message" time="0.45">
+    </testcase>
+    <testcase classname="Notification should call onClose after 5 seconds" name="Notification should call onClose after 5 seconds" time="0.071">
+    </testcase>
+    <testcase classname="Notification should call onClose when close button is clicked" name="Notification should call onClose when close button is clicked" time="0.976">
+    </testcase>
+    <testcase classname="Notification should apply success styles by default" name="Notification should apply success styles by default" time="0.106">
+    </testcase>
+    <testcase classname="Notification should apply error styles when type is error" name="Notification should apply error styles when type is error" time="0.038">
+    </testcase>
+    <testcase classname="Notification should fade out before closing" name="Notification should fade out before closing" time="0.043">
+    </testcase>
+    <testcase classname="Notification should cleanup timers on unmount" name="Notification should cleanup timers on unmount" time="0.019">
+    </testcase>
+  </testsuite>
+  <testsuite name="CommentSection" errors="0" failures="0" skipped="0" timestamp="2026-08-21T13:50:22" time="8.228" tests="6">
+    <testcase classname="CommentSection should render the comment section with existing comments" name="CommentSection should render the comment section with existing comments" time="0.47">
+    </testcase>
+    <testcase classname="CommentSection should submit a new comment" name="CommentSection should submit a new comment" time="1.804">
+    </testcase>
+    <testcase classname="CommentSection should handle error when submitting a comment" name="CommentSection should handle error when submitting a comment" time="1">
+    </testcase>
+    <testcase classname="CommentSection should render empty comments message when no comments are provided" name="CommentSection should render empty comments message when no comments are provided" time="0.023">
+    </testcase>
+    <testcase classname="CommentSection should disable the submit button when form fields are empty" name="CommentSection should disable the submit button when form fields are empty" time="0.019">
+    </testcase>
+    <testcase classname="CommentSection should display the correct timestamp for each comment" name="CommentSection should display the correct timestamp for each comment" time="0.028">
+    </testcase>
+  </testsuite>
+  <testsuite name="AddBugModal" errors="0" failures="0" skipped="0" timestamp="2026-08-21T13:50:22" time="9.014" tests="8">
+    <testcase classname="AddBugModal should not render when isOpen is false" name="AddBugModal should not render when isOpen is false" time="0.137">
+    </testcase>
+    <testcase classname="AddBugModal should render the modal when isOpen is true" name="AddBugModal should render the modal when isOpen is true" time="0.275">
+    </testcase>
+    <testcase classname="AddBugModal should handle form submission with correct data" name="AddBugModal should handle form submission with correct data" time="1.839">
+    </testcase>
+    <testcase classname="AddBugModal should close modal when Cancel button is clicked" name="AddBugModal should close modal when Cancel button is clicked" time="0.057">
+    </testcase>
+    <testcase classname="AddBugModal should update form data when inputs change" name="AddBugModal should update form data when inputs change" time="0.828">
+    </testcase>
+    <testcase classname="AddBugModal should not submit form with empty required fields" name="AddBugModal should not submit form with empty required fields" time="0.839">
+    </testcase>
+    <testcase classname="AddBugModal should have default Medium priority" name="AddBugModal should have default Medium priority" time="0.019">
+    </testcase>
+    <testcase classname="AddBugModal should reset form data after closing and reopening" name="AddBugModal should reset form data after closing and reopening" time="0.071">
+    </testcase>
+  </testsuite>
+  <testsuite name="BugList" errors="0" failures="0" skipped="0" timestamp="2026-08-21T13:50:21" time="9.174" tests="12">
+    <testcase classname="BugList Initial Rendering should render bug list after loading" name="BugList Initial Rendering should render bug list after loading" time="0.564">
+    </testcase>
+    <testcase classname="BugList Initial Rendering should show error message if bugs fetch fails" name="BugList Initial Rendering should show error message if bugs fetch fails" time="0.213">
+    </testcase>
+    <testcase classname="BugList Bug Operations should open add bug modal when clicking Add New Bug" name="BugList Bug Operations should open add bug modal when clicking Add New Bug" time="0.792">
+    </testcase>
+    <testcase classname="BugList Bug Operations should handle creating a new bug" name="BugList Bug Operations should handle creating a new bug" time="0.999">
+    </testcase>
+    <testcase classname="BugList Bug Operations should handle editing a bug" name="BugList Bug Operations should handle editing a bug" time="0.667">
+    </testcase>
+    <testcase classname="BugList Bug Operations should handle deleting a bug" name="BugList Bug Operations should handle deleting a bug" time="0.259">
+    </testcase>
+    <testcase classname="BugList Notifications should show success notification after creating bug" name="BugList Notifications should show success notification after creating bug" time="0.089">
+    </testcase>
+    <testcase classname="BugList Notifications should show success notification after deleting bug" name="BugList Notifications should show success notification after deleting bug" time="0.085">
+    </testcase>
+    <testcase classname="BugList Status and Priority Display should display correct status indicators" name="BugList Status and Priority Display should display correct status indicators" time="0.066">
+    </testcase>
+    <testcase classname="BugList Status and Priority Display should display correct priority indicators" name="BugList Status and Priority Display should display correct priority indicators" time="0.061">
+    </testcase>
+    <testcase classname="BugList displays the correct version number" name="BugList displays the correct version number" time="0.074">
+    </testcase>
+    <testcase classname="BugList displays the version number in the header" name="BugList displays the version number in the header" time="0.101">
+    </testcase>
+  </testsuite>
+</testsuites>

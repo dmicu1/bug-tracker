@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Test reports
 test-results.xml
+jest-results.json
+full-test-output.txt
+npm-ci-output.txt

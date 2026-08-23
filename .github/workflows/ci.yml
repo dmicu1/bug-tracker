@@ -3,16 +3,22 @@ name: CI
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
   contents: read
   actions: read
   checks: write
+  issues: write
+  pull-requests: write
 
 jobs:
   unit-tests-backend:
     runs-on: ubuntu-latest
+    outputs:
+      coverage_report: ${{ steps.tests_backend.outputs.coverage_report }}
     steps:
       - uses: actions/checkout@v7
       - name: Set up Go
@@ -25,6 +31,7 @@ jobs:
         run: go install github.com/jstemmer/go-junit-report@latest
 
       - name: Execute Backend Unit Tests
+        id: tests_backend
         working-directory: ./bugtracker-backend
         run: |
 
@@ -34,6 +41,12 @@ jobs:
           echo "```">> $GITHUB_STEP_SUMMARY
           cat coverage.txt >> $GITHUB_STEP_SUMMARY
           echo "```">> $GITHUB_STEP_SUMMARY
+
+          {
+            echo "coverage_report<<EOF"
+            cat coverage.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
           go test -v ./... 2>&1 | go-junit-report > test-results.xml
 
@@ -48,6 +61,9 @@ jobs:
   unit-tests-frontend:
     needs: unit-tests-backend
     runs-on: ubuntu-latest
+    outputs:
+      coverage_report: ${{ steps.tests_frontend.outputs.coverage_report }}
+
     steps:
       - uses: actions/checkout@v7
 
@@ -59,6 +75,7 @@ jobs:
           cache-dependency-path: ./bugtracker-frontend/package-lock.json
 
       - name: Execute Frontend Unit Tests
+        id: tests_frontend
         working-directory: ./bugtracker-frontend
         env:
           JEST_JUNIT_OUTPUT_DIR: .
@@ -128,6 +145,12 @@ jobs:
           cat full-test-output.txt >> $GITHUB_STEP_SUMMARY
           echo "```">> $GITHUB_STEP_SUMMARY
 
+          {
+            echo "coverage_report<<EOF"
+            cat full-test-output.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
           exit $test_exit
 
       - name: Ensure Frontend Test Results Exist
@@ -154,3 +177,30 @@ jobs:
           path: ./bugtracker-frontend/test-results.xml
           reporter: jest-junit
           fail-on-empty: true
+
+  create-coverage-comment:
+    if: ${{ always() && github.event_name == 'pull_request' }}
+    needs: [unit-tests-backend, unit-tests-frontend]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Create Test Coverage Comment
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## Test Coverage Report
+
+            ### Backend
+
+            ```text
+            ${{ needs['unit-tests-backend'].outputs.coverage_report }}
+            ```
+
+            ### Frontend
+
+            ```text
+            ${{ needs['unit-tests-frontend'].outputs.coverage_report }}
+            ```

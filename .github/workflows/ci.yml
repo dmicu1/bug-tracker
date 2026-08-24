@@ -216,6 +216,6 @@ jobs:
 
       - name: Launch Aplication
         run: |
-          docker-compose up -d --build
+          docker-compose up --build -d
           npx wait-on http://localhost:8080/api/health -t 30000
       

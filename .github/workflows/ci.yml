@@ -254,9 +254,10 @@ jobs:
           retention-days: 30      
 
       - name: Publish API Test Results
-        if: ${{ always() }}
         uses: dorny/test-reporter@v3
+        if: ${{ !cancelled() }}
         with:
-          name: API Tests Report
-          path: ./tests-api/test-results/*.xml
-          reporter: jest-junit
+          name: API Tests
+          path: ./tests-api/test-results/results.xml
+          reporter: java-junit
+          fail-on-empty: true

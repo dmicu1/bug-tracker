@@ -97,7 +97,7 @@ pipeline {
         stage('Api Test'){
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.50.0-noble'
+                    image 'mcr.microsoft.com/playwright:v1.62.1-noble'
                     reuseNode true
                     args '-u 0 --network=host'
                 }
@@ -123,7 +123,7 @@ pipeline {
         stage('E2E Tests'){
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.50.0-jammy'
+                    image 'mcr.microsoft.com/playwright:v1.62.1-noble'
                     reuseNode true
                     args '-u 0 --network=host'
                 }

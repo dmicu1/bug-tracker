@@ -204,3 +204,18 @@ jobs:
             ```text
             ${{ needs['unit-tests-frontend'].outputs.coverage_report }}
             ```
+            
+            
+  api-tests:
+    needs: [unit-tests-backend, unit-tests-frontend]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Launch Aplication
+        run: |
+          docker-compose up -d --build
+          npx wait-on http://localhost:8080/api/health -t 30000
+      

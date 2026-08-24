@@ -235,3 +235,9 @@ jobs:
       - name: Stop Application
         if: ${{ always() }}
         run: docker compose down
+
+      - name: Run API Test 
+        working-directory: ./tests-api
+        run: |
+          npm ci
+          npx playwright 

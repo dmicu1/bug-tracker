@@ -206,7 +206,7 @@ jobs:
             ```
             
             
-  api-e2etests:
+  api-e2et-ests:
     needs: [unit-tests-backend, unit-tests-frontend]
     runs-on: ubuntu-latest
 

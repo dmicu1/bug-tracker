@@ -246,7 +246,7 @@ jobs:
           
       - name: Run Performance Tests
         run: |
-          path: ./tests-perf/k6-report
+          mkdir -p ./tests-perf/k6-report
           docker run --rm \
             --network host \
             -v "${{ github.workspace }}/tests-perf:/scripts" \

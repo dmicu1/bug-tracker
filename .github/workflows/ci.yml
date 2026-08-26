@@ -247,14 +247,36 @@ jobs:
       - name: Run Performance Tests
         shell: bash
         run: |
+          set +e
           mkdir -p ./tests-perf/k6-report
           docker run --rm \
             --network host \
+            --user 0:0 \
             -v "${{ github.workspace }}/tests-perf:/scripts" \
             -w /scripts \
             -e BASE_URL=http://localhost:8080 \
-            grafana/k6:0.45.0 run script.js
+            grafana/k6:0.45.0 run script.js 2>&1 | tee ./tests-perf/k6-report/k6-output.log
+          k6_exit=${PIPESTATUS[0]}
+
+          if [ ! -s ./tests-perf/k6-report/index.html ]; then
+            cat > ./tests-perf/k6-report/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head><meta charset="utf-8"><title>Performance Test Report</title></head>
+            <body>
+              <h1>Performance Test Report</h1>
+              <p>k6 did not generate the HTML summary. Check k6-output.log in this artifact.</p>
+            </body>
+          </html>
+          EOF
+          fi
+
+          if [ ! -s ./tests-perf/k6-report/perf-results.json ]; then
+            printf '{"error":"k6 did not generate perf-results.json","log":"See k6-output.log"}\n' > ./tests-perf/k6-report/perf-results.json
+          fi
+
           ls -la ./tests-perf/k6-report
+          exit "$k6_exit"
 
       - name: Stop Application
         if: ${{ always() }}
@@ -292,6 +314,27 @@ jobs:
           name: e2e-test-playwright-report
           path: ./tests-e2e/playwright-report/
           retention-days: 30    
+
+      - name: Ensure Performance Test Report Exists
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          mkdir -p ./tests-perf/k6-report
+          if ! find ./tests-perf/k6-report -type f | grep -q .; then
+            cat > ./tests-perf/k6-report/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head><meta charset="utf-8"><title>Performance Test Report</title></head>
+            <body>
+              <h1>Performance Test Report</h1>
+              <p>The performance test did not produce report files. Check the workflow logs for the earlier failing step.</p>
+            </body>
+          </html>
+          EOF
+            printf '{"error":"performance report files were not generated"}\n' > ./tests-perf/k6-report/perf-results.json
+            printf 'Performance test report files were not generated. Check earlier workflow logs.\n' > ./tests-perf/k6-report/k6-output.log
+          fi
+          ls -la ./tests-perf/k6-report
 
       - name: Upload Performance Test Report
         if: ${{ always() }}

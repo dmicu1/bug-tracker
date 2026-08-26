@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 
 const isCI = Boolean(process.env.CI);
+const useExternalServers = process.env.PLAYWRIGHT_USE_EXTERNAL_SERVERS === "1";
 const frontendURL = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
 const backendURL = process.env.PLAYWRIGHT_API_BASE_URL || "http://localhost:8080";
 const e2eDBPath = path.join(os.tmpdir(), `bugtracker-e2e-${process.pid}.db`);
@@ -10,7 +11,7 @@ const e2eDBPath = path.join(os.tmpdir(), `bugtracker-e2e-${process.pid}.db`);
 export default defineConfig({
   testDir: ".",
   testMatch: "integration.spec.ts",
-  webServer: [
+  webServer: useExternalServers ? undefined : [
     {
       command: "go run ./cmd/bugtracker",
       cwd: "../bugtracker-backend",

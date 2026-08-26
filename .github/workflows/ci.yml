@@ -233,12 +233,15 @@ jobs:
           npx playwright test
 
       - name: Run E2E Tests
-        working-directory: ./tests-api
+        working-directory: ./tests-e2e
         env:
           CI: "1"
+          PLAYWRIGHT_USE_EXTERNAL_SERVERS: "1"
         run: |
           npm ci
           npx playwright install
+          npx wait-port http://localhost:3000 -t 60000
+          npx wait-port http://localhost:8080/api/health -t 30000
           npx playwright test    
 
       - name: Stop Application

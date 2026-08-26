@@ -260,7 +260,23 @@ jobs:
         with:
           name: api-test-playwright-report
           path: ./tests-api/playwright-report/
-          retention-days: 30      
+          retention-days: 30     
+          
+      - name: Upload E2E Test Results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results  
+          path: ./tests-e2e/test-results/
+          retention-days: 30  
+
+      - name: Upload E2E Test Playwright Report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-playwright-report
+          path: ./tests-e2e/playwright-report/
+          retention-days: 30    
 
       - name: Publish API Test Results
         uses: dorny/test-reporter@v3
@@ -268,5 +284,14 @@ jobs:
         with:
           name: API Tests
           path: ./tests-api/test-results/results.xml
+          reporter: java-junit
+          fail-on-empty: true
+        
+      - name: Publish E2E Test Results
+        uses: dorny/test-reporter@v3
+        if: ${{ !cancelled() }}
+        with:
+          name: E2E Tests
+          path: ./tests-e2e/test-results/results.xml
           reporter: java-junit
           fail-on-empty: true

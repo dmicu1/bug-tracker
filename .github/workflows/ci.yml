@@ -282,6 +282,75 @@ jobs:
         if: ${{ always() }}
         run: docker compose down
 
+      - name: Ensure API Test Reports Exist
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          mkdir -p ./tests-api/test-results ./tests-api/playwright-report
+
+          if [ ! -s ./tests-api/test-results/results.xml ]; then
+            cat > ./tests-api/test-results/results.xml <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <testsuites name="api tests" tests="1" failures="1" errors="0" skipped="0" time="0">
+            <testsuite name="api tests" tests="1" failures="1" errors="0" skipped="0" time="0">
+              <testcase classname="api tests" name="missing junit report" time="0">
+                <failure message="API test-results/results.xml was not generated">Check the Run API Tests step logs.</failure>
+              </testcase>
+            </testsuite>
+          </testsuites>
+          EOF
+          fi
+
+          if [ ! -s ./tests-api/playwright-report/index.html ]; then
+            cat > ./tests-api/playwright-report/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head><meta charset="utf-8"><title>API Playwright Report</title></head>
+            <body>
+              <h1>API Playwright Report</h1>
+              <p>The Playwright HTML report was not generated. Check the Run API Tests step logs.</p>
+            </body>
+          </html>
+          EOF
+          fi
+
+          ls -la ./tests-api/test-results
+          ls -la ./tests-api/playwright-report
+
+      - name: Ensure E2E Test Reports Exist
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          mkdir -p ./tests-e2e/test-results ./tests-e2e/playwright-report
+
+          if [ ! -s ./tests-e2e/test-results/results.xml ]; then
+            cat > ./tests-e2e/test-results/results.xml <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <testsuites name="e2e tests" tests="1" failures="1" errors="0" skipped="0" time="0">
+            <testsuite name="e2e tests" tests="1" failures="1" errors="0" skipped="0" time="0">
+              <testcase classname="e2e tests" name="missing junit report" time="0">
+                <failure message="E2E test-results/results.xml was not generated">Check the Run E2E Tests step logs.</failure>
+              </testcase>
+            </testsuite>
+          </testsuites>
+          EOF
+          fi
+
+          if [ ! -s ./tests-e2e/playwright-report/index.html ]; then
+            cat > ./tests-e2e/playwright-report/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head><meta charset="utf-8"><title>E2E Playwright Report</title></head>
+            <body>
+              <h1>E2E Playwright Report</h1>
+              <p>The Playwright HTML report was not generated. Check the Run E2E Tests step logs.</p>
+            </body>
+          </html>
+          EOF
+          fi
+
+          ls -la ./tests-e2e/test-results
+          ls -la ./tests-e2e/playwright-report
 
       - name: Upload API Test Results
         if: ${{ always() }}
@@ -289,6 +358,7 @@ jobs:
         with:
           name: api-test-results 
           path: ./tests-api/test-results/
+          if-no-files-found: error
           retention-days: 30  
           
       - name: Upload API Playwright Report
@@ -297,6 +367,7 @@ jobs:
         with:
           name: api-test-playwright-report
           path: ./tests-api/playwright-report/
+          if-no-files-found: error
           retention-days: 30     
           
       - name: Upload E2E Test Results
@@ -305,6 +376,7 @@ jobs:
         with:
           name: e2e-test-results  
           path: ./tests-e2e/test-results/
+          if-no-files-found: error
           retention-days: 30  
 
       - name: Upload E2E Test Playwright Report
@@ -313,23 +385,7 @@ jobs:
         with:
           name: e2e-test-playwright-report
           path: ./tests-e2e/playwright-report/
-          retention-days: 30    
-
-      - name: Upload Performance Raw Results
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-test-results
-          path: summary.json
-          retention-days: 30
-          
-          
-      - name: Upload Performance HTML Report
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-report
-          path: perf-results.html
+          if-no-files-found: error
           retention-days: 30    
 
       - name: Ensure Performance Test Report Exists

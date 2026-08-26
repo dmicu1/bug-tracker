@@ -245,6 +245,7 @@ jobs:
           npx playwright test   
           
       - name: Run Performance Tests
+        shell: bash
         run: |
           mkdir -p ./tests-perf/k6-report
           docker run --rm \
@@ -253,6 +254,7 @@ jobs:
             -w /scripts \
             -e BASE_URL=http://localhost:8080 \
             grafana/k6:0.45.0 run script.js
+          ls -la ./tests-perf/k6-report
 
       - name: Stop Application
         if: ${{ always() }}
@@ -296,7 +298,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: performance-test-report
-          path: ./tests-perf/k6-report/
+          path: ./tests-perf/k6-report/**
+          if-no-files-found: error
           retention-days: 30    
 
       - name: Publish API Test Results

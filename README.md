@@ -103,21 +103,38 @@ npx playwright test
 
 ### Performance Tests
 First, install K6:
+```powershell
+# Windows
+winget install k6
+
+# Or, if you use Chocolatey
+choco install k6
+```
+
 ```bash
 # MacOS
 brew install k6
-
-# Windows
-winget install k6
 
 # Linux
 For Linux installation instructions, please refer to the [official K6 installation guide](https://k6.io/docs/getting-started/installation#linux)
 ```
 
-Then run the tests:
-```bash
+Start the backend before running the performance test:
+```powershell
+docker compose up --build -d backend
+```
+
+Then run the test on Windows:
+```powershell
 cd tests-perf
-k6 run script.js
+.\run-local.ps1
+```
+
+If you run k6 directly, create the report directory first:
+```powershell
+cd tests-perf
+New-Item -ItemType Directory -Force k6-report | Out-Null
+k6 run .\script.js
 ```
 
 ## Project Structure

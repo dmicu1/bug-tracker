@@ -283,7 +283,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: API Tests
-          path: ./tests-api/test-results/results.xml
+          path: ./tests-api/test-results/*.xml
           reporter: java-junit
           fail-on-empty: true
         
@@ -292,6 +292,6 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: E2E Tests
-          path: ./tests-e2e/test-results/results.xml
+          path: ./tests-e2e/test-results/*.xml
           reporter: java-junit
           fail-on-empty: true

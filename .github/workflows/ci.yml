@@ -244,15 +244,15 @@ jobs:
           npx wait-port http://localhost:8080/api/health -t 30000
           npx playwright test   
           
-      - name: Setup K6
-        uses: grafana/setup-k6-action@v1
-        
       - name: Run Performance Tests
-        uses: grafana/k6-action@v1
-        with:
-          path: ./tests-perf/script.js
-          flags: --output json= summary.json 
-
+        run: |
+          mkdir -p ./tests-perf/k6-report
+          docker run --rm \
+            --network host \
+            -v "${{ github.workspace }}/tests-perf:/scripts" \
+            -w /scripts \
+            -e BASE_URL=http://localhost:8080 \
+            grafana/k6:0.45.0 run script.js
 
       - name: Stop Application
         if: ${{ always() }}
@@ -289,6 +289,14 @@ jobs:
         with:
           name: e2e-test-playwright-report
           path: ./tests-e2e/playwright-report/
+          retention-days: 30    
+
+      - name: Upload Performance Test Report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-test-report
+          path: ./tests-perf/k6-report/
           retention-days: 30    
 
       - name: Publish API Test Results

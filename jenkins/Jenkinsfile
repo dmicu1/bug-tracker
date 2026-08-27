@@ -134,8 +134,10 @@ pipeline {
             }
             steps {
                 dir('tests-e2e') {
-                    sh 'npm ci'
-                    sh 'npx playwright test'
+                    sh 'npm ci --no-audit --no-fund'
+                    sh 'npx wait-port http://localhost:3000 -t 60000'
+                    sh 'npx wait-port http://localhost:8080/api/health -t 30000'
+                    sh 'CI=1 PLAYWRIGHT_USE_EXTERNAL_SERVERS=1 npx playwright test'
                 }
             }
             post {

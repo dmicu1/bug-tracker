@@ -54,7 +54,7 @@ pipeline {
          stage('Unit Tests-Frontend') {
             agent {
                 docker {
-                    image 'node:20-alpine'
+                    image 'node:24-alpine'
                     reuseNode true
                     args '--user root:root -e HOME=/tmp'
                 }
@@ -63,10 +63,14 @@ pipeline {
                 dir('bugtracker-frontend') {
                     sh '''
                         npm install --no-audit --no-fund
-                        npm test -- --watch=false
+                        set +e
+                        npm test -- --watch=false --json --outputFile=jest-results.json
+                        TEST_EXIT_CODE=$?
+                        node scripts/jest-json-to-junit.mjs jest-results.json test-results.xml
                         mkdir -p reports
                         rm -rf reports/coverage
                         mv coverage reports/coverage
+                        exit $TEST_EXIT_CODE
                     '''
                 }
             }
